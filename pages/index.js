@@ -84,7 +84,8 @@ export async function getStaticProps({locale}) {
             pages:pages?JSON.parse(pages):[],
             errMsg:false,
             ...(await serverSideTranslations(locale, ['common',"product","policies"]))
-          }
+          },
+          revalidate:10
         }
   }catch(err){
     return {

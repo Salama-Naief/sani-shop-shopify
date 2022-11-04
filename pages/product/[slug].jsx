@@ -487,6 +487,7 @@ export async function getStaticProps(ctx) {
     let comments="";
     let rate="";
     let recommendedProducts=[]
+    
     if(JSON.parse(product)){
         const id=JSON.parse(product).id
         const commentRes = await fetch(URL, options(URL,id))
@@ -497,21 +498,23 @@ export async function getStaticProps(ctx) {
         recommendedProducts=await getProductRecommended(id,locale)
     }
 
-
+  
         const  ratedValueSplit=rate.product.metafields.edges[0]?rate.product.metafields.edges[0].node.value.split("-"):""
         return {
         props: {
            product:product?JSON.parse(product):{},
-           pages:pages?JSON.parse(pages):[],
+           pages:pages&&pages.length>0?JSON.parse(pages):[],
             recomendedProducts:recommendedProducts?JSON.parse(recommendedProducts):[],
            commentsData:comments?comments.product.metafields.edges:[],
            rateData:rate.product.metafields.edges[0]?{rateId:rate.product.metafields.edges[0].node.id,rateValue:ratedValueSplit[0]?ratedValueSplit[0]:0,numOfPeopleRated:ratedValueSplit[1]?ratedValueSplit[1]:0}:null,
             errMsg:false,
             ...(await serverSideTranslations(locale, ['common',"product"]))
+        
         },
+        revalidate:10
         }
     }catch(err){
-        
+        console.log("error",err)
         return {
             props: {
                errMsg:true

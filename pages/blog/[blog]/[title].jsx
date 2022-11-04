@@ -150,7 +150,8 @@ export const getStaticProps=async(ctx)=>{
           pages:JSON.parse(pages)||[],
            errMsg:false,
           ...(await serverSideTranslations(locale, ['common',"product"]))
-        }
+        },
+        revalidate:10
       }
 
     }catch(err){
