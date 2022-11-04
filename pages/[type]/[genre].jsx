@@ -332,7 +332,7 @@ export async function getServerSideProps(ctx) {
             props: {
                 collection:collection?JSON.parse(collection):null,
                 products:products.length>0?JSON.parse(products):[],
-                pages:pages?JSON.parse(pages):[],
+                pages:pages&&pages.length>0?JSON.parse(pages):[],
                 errMsg:false, 
                 ...(await serverSideTranslations(locale, ['common',"product"]))
             },
