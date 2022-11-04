@@ -251,7 +251,7 @@ useEffect(()=>{
         setCommentLoading(false)
       }
 
-    if(rateRes.product.metafields.edges.length>0){
+    if(rateRes.product&&rateRes.product.metafields.edges.length>0){
               rateRes.product.metafields.edges.map(item=>{
                   if(item.node.namespace==="rate"){
                       const value=item.node.value.split("-");     
@@ -499,14 +499,14 @@ export async function getStaticProps(ctx) {
     }
 
   
-        const  ratedValueSplit=rate.product.metafields.edges[0]?rate.product.metafields.edges[0].node.value.split("-"):""
+        const  ratedValueSplit=rate.product&&rate.product.metafields.edges[0]?rate.product.metafields.edges[0].node.value.split("-"):""
         return {
         props: {
            product:product?JSON.parse(product):{},
            pages:pages&&pages.length>0?JSON.parse(pages):[],
             recomendedProducts:recommendedProducts?JSON.parse(recommendedProducts):[],
            commentsData:comments?comments.product.metafields.edges:[],
-           rateData:rate.product.metafields.edges[0]?{rateId:rate.product.metafields.edges[0].node.id,rateValue:ratedValueSplit[0]?ratedValueSplit[0]:0,numOfPeopleRated:ratedValueSplit[1]?ratedValueSplit[1]:0}:null,
+           rateData:rate.product&&rate.product.metafields.edges[0]?{rateId:rate.product.metafields.edges[0].node.id,rateValue:ratedValueSplit[0]?ratedValueSplit[0]:0,numOfPeopleRated:ratedValueSplit[1]?ratedValueSplit[1]:0}:null,
             errMsg:false,
             ...(await serverSideTranslations(locale, ['common',"product"]))
         
