@@ -97,7 +97,7 @@ import SmallLoader from '../../components/loading/SmallLoader';
           setNumOfPeopleRated(ratedValueSplit[1]?ratedValueSplit[1]:0)
         }
 
-        const recommendedProductsRes=await getProductRecommended(id,locale)
+        const recommendedProductsRes=await getProductRecommended(product.id,locale)
         const recommendedProducts=JSON.parse(recommendedProductsRes);
         if(recommendedProducts&&recommendedProducts.length>0){
           setProductRecommended(recommendedProducts)
