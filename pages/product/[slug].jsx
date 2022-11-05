@@ -96,7 +96,19 @@ import SmallLoader from '../../components/loading/SmallLoader';
           setRateValue(ratedValueSplit[0]?ratedValueSplit[0]:0)
           setNumOfPeopleRated(ratedValueSplit[1]?ratedValueSplit[1]:0)
         }
-        if(product.id){
+       
+      }
+     }
+
+     funComment();
+
+  },[product])
+
+  useEffect(()=>{
+    console.log("product",product)
+
+      const funRecomendedProducts=async()=>{
+        if(product&&product.id){
           const recommendedProductsRes=await getProductRecommended(product.id,i18n.language)
           console.log("recommendedProductsRes",recommendedProductsRes)
           const recommendedProducts=JSON.parse(recommendedProductsRes);
@@ -106,10 +118,7 @@ import SmallLoader from '../../components/loading/SmallLoader';
           }
         }
       }
-     }
-
-     funComment();
-
+      funRecomendedProducts()
   },[product])
     useEffect(()=>{
       router.push({pathname,query},asPath,{locale:i18n.language})
@@ -343,7 +352,7 @@ useEffect(()=>{
     return(
         <Layout title={`product-${product.title}`} desc={"product.meta_desc"}  pages={pages}>
             <div className="container relative  mx-auto my-4 h-fit ">
-
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 mb-4">
                     <div ref={imgHight} className="col-span-1 h-full text-center">
                         {<SingleProductSliders type="product" img={varientData.image} variants={product.images.edges}/>}
