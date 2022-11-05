@@ -124,7 +124,9 @@ useEffect(()=>{
     setWindowsWidth(window.innerWidth)
     setHeight(imgHight.current?.offsetHeight)
     setLoading(false);
-    dispatch({type:"ADD_VIEWED_CARD",payload:product});
+    if(product){
+      dispatch({type:"ADD_VIEWED_CARD",payload:product});
+    }
    },[imgHight,loading,product])
  
    useEffect(()=>{
@@ -445,8 +447,8 @@ useEffect(()=>{
             </div>
             <div className=''>
                 <div className='my-8'><hr/></div>
-                {productRecommended.length>0&& <Slider type="related" title={t("product:Related_Product")} products={productRecommended}/>}
-                {viewedCart.length>0&&<Carousel type="recentViewed" title={t("product:recent_viewed")} products={viewedCart}/>}
+                {productRecommended&&productRecommended.length>0&& <Slider type="related" title={t("product:Related_Product")} products={productRecommended}/>}
+                {viewedCart&&viewedCart.length>0&&<Carousel type="recentViewed" title={t("product:recent_viewed")} products={viewedCart}/>}
             </div>
             <hr/>
             <div className='flex w-full justify-center my-6'>
@@ -490,7 +492,6 @@ useEffect(()=>{
 export async function getStaticPaths ({locales}){
   try{
     const productsRes= await getProductsHandle()
-    console.log("productsRes",productsRes)
     const products=productsRes&&JSON.parse(productsRes)
    const paths=[]
    products&&products.edges.map(product=>{
@@ -538,23 +539,23 @@ export async function getStaticProps(ctx) {
     let rate="";
     let recommendedProducts=[]
     
-    if(JSON.parse(product)){
-        const id=JSON.parse(product).id
+   /* if(JSON.parse(product)){
+       // const id=JSON.parse(product).id
       //  const commentRes = await fetch(URL, options(URL,id))
        // comments=await commentRes.json();
        // const rateRes = await fetch(rateURL, options(rateURL,id))
        // rate=await rateRes.json();
 
-        recommendedProducts=await getProductRecommended(id,locale)
-    }
-
+        //recommendedProducts=await getProductRecommended(id,locale)
+    }*/
+//recommendedProducts?JSON.parse(recommendedProducts):[],
   
        // const  ratedValueSplit=rate.product&&rate.product.metafields.edges[0]?rate.product.metafields.edges[0].node.value.split("-"):""
         return {
         props: {
            product:product?JSON.parse(product):{},
            pages:pages&&pages.length>0?JSON.parse(pages):[],
-            recomendedProducts:recommendedProducts?JSON.parse(recommendedProducts):[],
+            recomendedProducts:[],
            //commentsData:comments?comments.product.metafields.edges:[],
           // rateData:rate.product&&rate.product.metafields.edges[0]?{rateId:rate.product.metafields.edges[0].node.id,rateValue:ratedValueSplit[0]?ratedValueSplit[0]:0,numOfPeopleRated:ratedValueSplit[1]?ratedValueSplit[1]:0}:null,
             errMsg:false,
