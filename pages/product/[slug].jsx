@@ -96,11 +96,14 @@ import SmallLoader from '../../components/loading/SmallLoader';
           setRateValue(ratedValueSplit[0]?ratedValueSplit[0]:0)
           setNumOfPeopleRated(ratedValueSplit[1]?ratedValueSplit[1]:0)
         }
-
-        const recommendedProductsRes=await getProductRecommended(product.id,i18n.language)
-        const recommendedProducts=JSON.parse(recommendedProductsRes);
-        if(recommendedProducts&&recommendedProducts.length>0){
-          setProductRecommended(recommendedProducts)
+        if(product.id){
+          const recommendedProductsRes=await getProductRecommended(product.id,i18n.language)
+          console.log("recommendedProductsRes",recommendedProductsRes)
+          const recommendedProducts=JSON.parse(recommendedProductsRes);
+          console.log("recommendedProducts",recommendedProducts)
+          if(recommendedProducts&&recommendedProducts.length>0){
+            setProductRecommended(recommendedProducts)
+          }
         }
       }
      }
