@@ -24,17 +24,13 @@ import axios from "axios";
 const HeadBar=({pages})=>{
     const router =useRouter();
     const {state,dispatch} =useContext(Store);
-    const pagesContent=pages.length>0?pages:state.pages
     const [cartProduct,setCartProduct]=useState([]);
     const [user,setUser]=useState(null);
     const [menuUser,setMenuUser]=useState(false);
     const [menuCart,setMenuCart]=useState(false);
     const [menuHeart,setMenuHeart]=useState(false);
     const [menuItems,setMenItems]=useState(false);
-    const [pageItems,setPageItems]=useState("");
     const {t,i18n} =useTranslation();
-    const [productsItems,setProductsItems]=useState([])
-    const [typeQuery,setTypeQuery]=useState(null);
     const [searchProducts,setSearchProducts]=useState(null);
     const [search,setSearch]=useState("");
     
@@ -59,22 +55,13 @@ const HeadBar=({pages})=>{
       
       }
       funSearch();
-     },[search])
+     },[search,i18n.language])
 
     useEffect(()=>{
       setCartProduct(state.cart.cartItems)
       setUser(state.user);
     },[state,cartProduct])
 
-
-    const handleUpdate=(qty,product)=>{
-      const quantity= parseInt(qty);
-      dispatch({type:"ADD_TO_CART",payload:{...product,quantity:quantity}})
-    }
-
-    const handleRemoceCart=(product)=>{
-      dispatch({type:"REMOVE_FROM_CART",payload:{...product}})
-    }
     const closeMenus=()=>{
 
       setMenItems(false)
@@ -270,7 +257,7 @@ const handleChandeLang=(e)=>{
                             </form>
             <div className="text-base ">
             {
-                  pages.length>0&&pages.map((page,index)=>(
+                  pages&&pages.length>0&&pages.map((page,index)=>(
                     <div key={index}  onMouseOver={()=>setHoverPage(page.node.title)} onMouseOut={()=>setHoverPage(null)}  className="relative">
                       {
                         page.node.handle==="home"?(

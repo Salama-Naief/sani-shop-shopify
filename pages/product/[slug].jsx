@@ -47,10 +47,10 @@ import SmallLoader from '../../components/loading/SmallLoader';
   const [commentLoading,setCommentLoading]=useState(false);
   const [commentMessage,setCommentMessage]=useState("");
   const [commentErrorMessage,setCommentErrorMessage]=useState("");
-  const [comments,setComments]=useState(commentsData?commentsData:[]);
-  const [rateId,setRateId]=useState(rateData?rateData.rateId:0);
-  const [rateValue,setRateValue]=useState(rateData?rateData.rateValue:0);
-  const [numOfPeopleRated,setNumOfPeopleRated]=useState(rateData?rateData.numOfPeopleRated:0);
+  const [comments,setComments]=useState([]);
+  const [rateId,setRateId]=useState(null);
+  const [rateValue,setRateValue]=useState(0);
+  const [numOfPeopleRated,setNumOfPeopleRated]=useState(0);
   const [rate,setRate]=useState(5);
 
   const [checkoutLoading,setCheckoutLoading]=useState(false);
@@ -60,10 +60,51 @@ import SmallLoader from '../../components/loading/SmallLoader';
   const email=useRef();
   const message=useRef();
 
-  console.log("pages",pages)
-      useEffect(()=>{
-        router.push({pathname,query},asPath,{locale:i18n.language})
-      },[i18n.language])
+ /* if(!product||!pages){
+    return(
+      <div className='flex items-center justify-center'>Error in backend</div>
+    )
+  }*/
+
+
+  useEffect(()=>{
+     const funComment=async()=>{
+      const URL = `${API_URL}/getComments`
+    const rateURL = `${API_URL}/getRate`
+     const options=(url,productId)=>{
+        return{
+                endpoint: url,
+                method: "POST",
+                headers: {
+                  "Accept": "application/json",
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id:productId })   
+        }
+     }
+     if(product){
+        const commentRes = await fetch(URL, options(URL,product.id))
+        comments=await commentRes.json();
+        const rateRes = await fetch(rateURL, options(rateURL,product.id))
+        rate=await rateRes.json();  
+           console.log("comments",comments)
+           console.log("rate",rate)
+        const  ratedValueSplit=rate.product&&rate.product.metafields.edges[0]?rate.product.metafields.edges[0].node.value.split("-"):""
+        setComments(comments?comments.product.metafields.edges:[])
+        if(rate&&rate.product&&rate.product.metafields.edges[0]){
+          setRateId(rate.product.metafields.edges[0].node.id)
+          setRateValue(ratedValueSplit[0]?ratedValueSplit[0]:0)
+          setNumOfPeopleRated(ratedValueSplit[1]?ratedValueSplit[1]:0)
+        }
+      }
+     }
+
+     funComment();
+
+  },[product])
+    useEffect(()=>{
+      router.push({pathname,query},asPath,{locale:i18n.language})
+    },[i18n.language])
 
 useEffect(()=>{
     setComments(commentsData?commentsData:[])
@@ -447,10 +488,12 @@ useEffect(()=>{
 }
 
 export async function getStaticPaths ({locales}){
+  try{
     const productsRes= await getProductsHandle()
-    const products=JSON.parse(productsRes)
+    console.log("productsRes",productsRes)
+    const products=productsRes&&JSON.parse(productsRes)
    const paths=[]
-   products.edges.map(product=>{
+   products&&products.edges.map(product=>{
           paths.push({params:{slug:product.node.handle},locale:locales[1]},{params:{slug:product.node.handle},locale:locales[0]})
     })
 
@@ -458,9 +501,16 @@ export async function getStaticPaths ({locales}){
         paths,
         fallback:false
     }
+  }catch(err){
+    return{
+      paths:[{params:{slug:""}}],
+      fallback:false
+  }
+  }
+
 }
 export async function getStaticProps(ctx) {
-    const URL = `${API_URL}/getComments`
+   /* const URL = `${API_URL}/getComments`
     const rateURL = `${API_URL}/getRate`
      const options=(url,productId)=>{
         return{
@@ -473,7 +523,7 @@ export async function getStaticProps(ctx) {
                 body: JSON.stringify({ id:productId })
               
         }
-     }
+     }*/
     try{
     const {slug} =ctx.params;
     const locale=ctx.locale;
@@ -490,23 +540,23 @@ export async function getStaticProps(ctx) {
     
     if(JSON.parse(product)){
         const id=JSON.parse(product).id
-        const commentRes = await fetch(URL, options(URL,id))
-        comments=await commentRes.json();
-        const rateRes = await fetch(rateURL, options(rateURL,id))
-        rate=await rateRes.json();
+      //  const commentRes = await fetch(URL, options(URL,id))
+       // comments=await commentRes.json();
+       // const rateRes = await fetch(rateURL, options(rateURL,id))
+       // rate=await rateRes.json();
 
         recommendedProducts=await getProductRecommended(id,locale)
     }
 
   
-        const  ratedValueSplit=rate.product&&rate.product.metafields.edges[0]?rate.product.metafields.edges[0].node.value.split("-"):""
+       // const  ratedValueSplit=rate.product&&rate.product.metafields.edges[0]?rate.product.metafields.edges[0].node.value.split("-"):""
         return {
         props: {
            product:product?JSON.parse(product):{},
            pages:pages&&pages.length>0?JSON.parse(pages):[],
             recomendedProducts:recommendedProducts?JSON.parse(recommendedProducts):[],
-           commentsData:comments?comments.product.metafields.edges:[],
-           rateData:rate.product&&rate.product.metafields.edges[0]?{rateId:rate.product.metafields.edges[0].node.id,rateValue:ratedValueSplit[0]?ratedValueSplit[0]:0,numOfPeopleRated:ratedValueSplit[1]?ratedValueSplit[1]:0}:null,
+           //commentsData:comments?comments.product.metafields.edges:[],
+          // rateData:rate.product&&rate.product.metafields.edges[0]?{rateId:rate.product.metafields.edges[0].node.id,rateValue:ratedValueSplit[0]?ratedValueSplit[0]:0,numOfPeopleRated:ratedValueSplit[1]?ratedValueSplit[1]:0}:null,
             errMsg:false,
             ...(await serverSideTranslations(locale, ['common',"product"]))
         

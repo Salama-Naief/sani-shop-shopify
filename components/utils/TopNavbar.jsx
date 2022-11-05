@@ -71,7 +71,7 @@ setProductsItems([{type:"accessories",items:accessoryArray},{type:"clothes",item
         <div className="container flex justify-between mx-auto text-base">
           <div className="flex ">
               {
-                  pages.length>0&&pages.map((page,index)=>(
+                  pages&&pages.length>0&&pages.map((page,index)=>(
                     <div key={index}  onMouseOver={()=>setHoverPage(page.node.title)} onMouseOut={()=>setHoverPage(null)}  className="relative">
                       {
                         page.node.handle==="home"?(

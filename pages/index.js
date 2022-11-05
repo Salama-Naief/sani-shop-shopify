@@ -18,6 +18,7 @@ import { mutationTest, productMetafiedAdmin } from '../lib/shopifyAdmin';
 
 
 
+
  function Home({errMsg ,pages,newColloction,bottomSection,topSection,panerSection,sellingColloction,offersColloction}) {
   
   const router =useRouter();
@@ -72,7 +73,7 @@ export async function getStaticProps({locale}) {
     const bottomSection=await getCollections("bottomSection",2,locale)
     const pages=await getPages(locale)
 
-
+console.log("pages",pages)
         return {
           props: {
             sellingColloction:sellingColloction?JSON.parse(sellingColloction):{},
@@ -88,6 +89,7 @@ export async function getStaticProps({locale}) {
           revalidate:10
         }
   }catch(err){
+    console.log("err".err)
     return {
       props: {
         errMsg:true,

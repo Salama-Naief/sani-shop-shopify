@@ -9,7 +9,7 @@ import { API_URL } from '../../utils/url';
 import Loading from '../../components/loading/Loading';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
-import { collectionHandle, getCollectionByHande, getPages, getProducts, getProductsHandle } from '../../lib/shopify';
+import { collectionHandle, getCollectionByHande, getPages, getProducts, getProductsHandle, searchProducts } from '../../lib/shopify';
 
  function Products({collection,errMsg,pages,products}){
     const router=useRouter();
@@ -308,62 +308,22 @@ const handleFilterSize=()=>{
     )
 }
 
-export async function getStaticPaths ({locales}){
-    try{
-      const productsRes= await getProductsHandle()
-      const products=productsRes&&JSON.parse(productsRes)
-      const collectionRes= await collectionHandle()
-      const collections=collectionRes&&JSON.parse(collectionRes)
-      const pagesRes=await getPages(locales[0])
-      const pages=pagesRes&&JSON.parse(pagesRes)
-     const productsArr=[]
-     const collectionsArr=[]
-     const pagesArr=[]
-     products&&products.edges.map(product=>{
-        productsArr.push({params:{type:"products",genre:product.node.handle},locale:locales[1]},{params:{type:"products",genre:product.node.handle},locale:locales[0]})
-    })
-
-        collections&&collections.edges.map(collection=>{
-            collectionsArr.push({params:{type:"collection",genre:collection.node.handle},locale:locales[1]},{params:{type:"collection",genre:collection.node.handle},locale:locales[0]})
-        })
-        pages&&pages.map(page=>{
-            pagesArr.push({params:{type:"products",genre:page.node.handle},locale:locales[1]},{params:{type:"products",genre:page.node.handle},locale:locales[0]})
-        })
-     
-
-        const paths=[...productsArr,...collectionsArr,...pagesArr]
-      return{
-          paths:paths.length>0?paths:[{params:{type:"",genre:""}}],
-          fallback:false
-      }
-    }catch(err){
-        console.log("err",err)
-      return{
-        paths:[{params:{type:"",genre:""}}],
-        fallback:false
-    }
-    }
-  
-  }
 
 
-export async function getStaticProps(ctx) {
 
+export async function getServerSideProps(ctx) {
+
+   ctx.res.setHeader(
+     "Cache-Control","public,s-maxage=10,stale-while-revalidate=59"
+   )
     const locale=ctx.locale;
     try{
-        const {genre,type} =ctx.params;
-        let products=[];
-        let collection=null;
-        if(type==="products"){
-           products=await getProducts(genre,locale)
-        }else if(type==="collection"){
-            collection=await getCollectionByHande(genre,20,locale)
-        }
-        
+        const {search} =ctx.params;
+
+       const products=await searchProducts(search,locale)
         const pages=await getPages(locale)
             return {
             props: {
-                collection:collection?JSON.parse(collection):null,
                 products:products.length>0?JSON.parse(products):[],
                 pages:pages&&pages.length>0?JSON.parse(pages):[],
                 errMsg:false, 
