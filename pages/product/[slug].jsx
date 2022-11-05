@@ -96,6 +96,12 @@ import SmallLoader from '../../components/loading/SmallLoader';
           setRateValue(ratedValueSplit[0]?ratedValueSplit[0]:0)
           setNumOfPeopleRated(ratedValueSplit[1]?ratedValueSplit[1]:0)
         }
+
+        const recommendedProductsRes=await getProductRecommended(id,locale)
+        const recommendedProducts=JSON.parse(recommendedProductsRes);
+        if(recommendedProducts&&recommendedProducts.length>0){
+          setProductRecommended(recommendedProducts)
+        }
       }
      }
 
@@ -166,11 +172,7 @@ const handleChangeVarients=(type,value)=>{
     }
 
 }
-   //getRecomended products
-   useEffect(()=>{
-        setProductRecommended(recomendedProducts)
 
-   },[recomendedProducts])
 
 
    
@@ -511,20 +513,6 @@ export async function getStaticPaths ({locales}){
 
 }
 export async function getStaticProps(ctx) {
-   /* const URL = `${API_URL}/getComments`
-    const rateURL = `${API_URL}/getRate`
-     const options=(url,productId)=>{
-        return{
-                endpoint: url,
-                method: "POST",
-                headers: {
-                  "Accept": "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ id:productId })
-              
-        }
-     }*/
     try{
     const {slug} =ctx.params;
     const locale=ctx.locale;
@@ -533,31 +521,11 @@ export async function getStaticProps(ctx) {
     const pages=await getPages(locale)
     const product= await getProductByHande(slug,locale)  
  
-   
-    // get comments and rates
-    let comments="";
-    let rate="";
-    let recommendedProducts=[]
-    
-   /* if(JSON.parse(product)){
-       // const id=JSON.parse(product).id
-      //  const commentRes = await fetch(URL, options(URL,id))
-       // comments=await commentRes.json();
-       // const rateRes = await fetch(rateURL, options(rateURL,id))
-       // rate=await rateRes.json();
-
-        //recommendedProducts=await getProductRecommended(id,locale)
-    }*/
-//recommendedProducts?JSON.parse(recommendedProducts):[],
-  
-       // const  ratedValueSplit=rate.product&&rate.product.metafields.edges[0]?rate.product.metafields.edges[0].node.value.split("-"):""
         return {
         props: {
            product:product?JSON.parse(product):{},
            pages:pages&&pages.length>0?JSON.parse(pages):[],
             recomendedProducts:[],
-           //commentsData:comments?comments.product.metafields.edges:[],
-          // rateData:rate.product&&rate.product.metafields.edges[0]?{rateId:rate.product.metafields.edges[0].node.id,rateValue:ratedValueSplit[0]?ratedValueSplit[0]:0,numOfPeopleRated:ratedValueSplit[1]?ratedValueSplit[1]:0}:null,
             errMsg:false,
             ...(await serverSideTranslations(locale, ['common',"product"]))
         
